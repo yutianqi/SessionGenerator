@@ -17,15 +17,15 @@ VERSION_6_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
 VERSION_7_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
-config_path = ""
+CONFIG_PATH = ""
 
 
 def main():
-    global config_path
+    global CONFIG_PATH
     if os.path.exists(VERSION_6_CONFIG_PATH):
-        config_path = VERSION_6_CONFIG_PATH
+        CONFIG_PATH = VERSION_6_CONFIG_PATH
     elif os.path.exists(VERSION_7_CONFIG_PATH):
-        config_path = VERSION_7_CONFIG_PATH
+        CONFIG_PATH = VERSION_7_CONFIG_PATH
 
     fileName = ""
     if len(sys.argv) > 1:
@@ -98,8 +98,7 @@ def generate(data):
                 for node in nodes:
                     generateFile(projectName, regionName, nodeType, backendIP,
                                  backendPort, backendUserName, backendPassWord, node)
-        shutil.move(projectName, config_path)
-    return ""
+        shutil.move(projectName, CONFIG_PATH)
 
 
 def generateFile(projectName, regionName, nodeType, backendIP, backendPort, backendUserName, backendPassWord, node):
@@ -155,7 +154,7 @@ def loadTemplate(fileName):
     return config
 
 
-def encrypt(passwd, key=None):
+def encrypt(passwd):
     key = getkey()
     tmp = SHA256.new(key.encode('ascii')).digest()
     r3 = passwd.encode('ascii')
