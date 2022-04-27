@@ -3,20 +3,22 @@
 
 import os
 import sys
-from domain.my_config_parser import MyConfigParser
-import win32api
-import win32security
-
-from Crypto.Hash import SHA256
-from Crypto.Cipher import ARC4
 import base64
 import shutil
+import win32api
+import win32security
+from Crypto.Hash import SHA256
+from Crypto.Cipher import ARC4
+from domain.my_config_parser import MyConfigParser
 
-DATA_FILE_NAME = 'data2.csv'
+DATA_FILE_NAME = 'data.csv'
 TEMPALTE_FILE_NAME = 'template.xsh'
-VERSION_6_CONFIG_PATH = os.path.join(os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
-VERSION_7_CONFIG_PATH = os.path.join(os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
+VERSION_6_CONFIG_PATH = os.path.join(
+    os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
+VERSION_7_CONFIG_PATH = os.path.join(
+    os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
 config_path = ""
+
 
 def main():
     global config_path
@@ -33,11 +35,6 @@ def main():
     data = parse(fileName)
     # print(data)
     generate(data)
-
-    
-
-    
-
 
 
 def parse(dataFileName):
@@ -101,8 +98,7 @@ def generate(data):
                 for node in nodes:
                     generateFile(projectName, regionName, nodeType, backendIP,
                                  backendPort, backendUserName, backendPassWord, node)
-
-        shutil.move(projectName, config_path) 
+        shutil.move(projectName, config_path)
     return ""
 
 
@@ -182,4 +178,3 @@ if __name__ == '__main__':
     # print(getkey())
     # print(encrypt("Changeme_123"))
     main()
-
