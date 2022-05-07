@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-# encoding=utf8
+#encoding=utf8
 
 import os
-import sys
 import base64
 import shutil
-from tkinter import NE
 import win32api
 import win32security
 from Crypto.Hash import SHA256
@@ -13,10 +11,21 @@ from Crypto.Cipher import ARC4
 from domain.my_config_parser import MyConfigParser
 
 TEMPALTE_FILE_NAME = 'template.xsh'
+VERSION_6_CONFIG_PATH = os.path.join(
+    os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
+VERSION_7_CONFIG_PATH = os.path.join(
+    os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
+
+
 
 class XShellSessionGenerator():
+    CONFIG_PATH = ""
+    if os.path.exists(VERSION_6_CONFIG_PATH):
+        CONFIG_PATH = VERSION_6_CONFIG_PATH
+    elif os.path.exists(VERSION_7_CONFIG_PATH):
+        CONFIG_PATH = VERSION_7_CONFIG_PATH
 
-    def generate(self, data):
+    def generate(self, data, update=False):
         for (projectName, project) in data.items():
             # print("Projet:" + projectName)
             for (regionName, region) in project.items():
@@ -39,7 +48,12 @@ class XShellSessionGenerator():
                     for node in nodes:
                         self.generateFile(projectName, regionName, nodeType, backendIP,
                                     backendPort, backendUserName, backendPassWord, node)
-            # shutil.move(projectName, CONFIG_PATH)
+        if update():
+            self.save()
+
+    def save(self, projectName):
+        # shutil.move(projectName, CONFIG_PATH)
+        print("mv" + projectName + "to" + self.CONFIG_PATH)
 
 
     def generateFile(self,projectName, regionName, nodeType, backendIP, backendPort, backendUserName, backendPassWord, node):
