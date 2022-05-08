@@ -40,17 +40,30 @@ class NetEcoConfigParserV2():
         return ret
 
     def parseNode(self, rawMap, jumper):
-        # print(jumper)
+
         node = {
             "nodeName": rawMap.get("nodeName"),
             "nodeType": "session",
-            "ip": rawMap.get("ip"),
-            "port": rawMap.get("port"),
-            "username": rawMap.get("username"),
-            "password": rawMap.get("password"),
         }
+
         if jumper:
-            node["jumper"] = jumper
+            node["ip"] = jumper.get("ip")
+            node["port"] = jumper.get("port")
+            node["username"] = jumper.get("username")
+            node["password"] = jumper.get("password")
+            node["jumper"] = {
+                "nodeType": "session",
+                "ip":rawMap.get("ip"),
+                "port":rawMap.get("port"),
+                "username":rawMap.get("username"),
+                "password":rawMap.get("password"),    
+            }
+        else:
+            node["ip"] = rawMap.get("ip")
+            node["port"] = rawMap.get("port")
+            node["username"] = rawMap.get("username")
+            node["password"] = rawMap.get("password")
+
         return node
 
     def parse(self, dataFileName):

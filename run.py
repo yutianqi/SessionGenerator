@@ -2,10 +2,10 @@
 #encoding=utf8
 
 import sys
-from NetEcoConfigParser import NetEcoConfigParser
+# from NetEcoConfigParser import NetEcoConfigParser
 from NetEcoConfigParserV2 import NetEcoConfigParserV2
-from XShellSessionGenerator import XShellSessionGenerator
-from CommonSessionGenerator import CommonSessionGenerator
+# from XShellSessionGenerator import XShellSessionGenerator
+# from CommonSessionGenerator import CommonSessionGenerator
 from iTerm2SessionGenerator import iTerm2SessionGenerator
 
 
@@ -26,7 +26,8 @@ def main():
     # generator = XShellSessionGenerator()
     # generator = CommonSessionGenerator()
     generator = iTerm2SessionGenerator()
-    generator.generate(data, True)
+    # generator.generate(data, True)
+    generator.generate(data, False)
 
 
 if __name__ == '__main__':
