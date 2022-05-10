@@ -25,16 +25,21 @@ class iTerm2SessionGenerator():
             self.arrangeNodeId(item)
         # print(data)
         if update:
-            self.save(data, CONFIG_FILE_PATH)
+            # self.save(data, CONFIG_FILE_PATH)
+            self.save(data, TMP_FILE_NAME)
         else:
             with open(TMP_FILE_NAME, "w", encoding="utf-8") as f:
                 json.dump(data, f)
 
     def save(self, data, filePath):
-        sessions = {}
+        sessions = []
+        '''
         with open(filePath, encoding="utf-8") as f:
             lines = f.readlines()
             sessions = json.loads("".join(lines))
+        # print(sessions)
+        '''
+        # sessions.get('nodes').extend(data)
         sessions.extend(data)
         with open(filePath, "w", encoding="utf-8") as f:
             json.dump(sessions, f)

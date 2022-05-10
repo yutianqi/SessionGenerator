@@ -17,7 +17,6 @@ VERSION_7_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
 
 
-
 class XShellSessionGenerator():
     CONFIG_PATH = ""
     if os.path.exists(VERSION_6_CONFIG_PATH):
@@ -25,11 +24,9 @@ class XShellSessionGenerator():
     elif os.path.exists(VERSION_7_CONFIG_PATH):
         CONFIG_PATH = VERSION_7_CONFIG_PATH
 
-    def generate(self, data, update=False):
+    def generate(self, data, update=True):
         for (projectName, project) in data.items():
-            # print("Projet:" + projectName)
             for (regionName, region) in project.items():
-                # print("Region:" + regionName)
                 if region.get("Backend"):
                     backend = region.get("Backend")[0]
                     backendIP = backend.get("ip")
@@ -47,69 +44,70 @@ class XShellSessionGenerator():
                         continue
                     for node in nodes:
                         self.generateFile(projectName, regionName, nodeType, backendIP,
-                                    backendPort, backendUserName, backendPassWord, node)
-        if update():
-            self.save()
+                                          backendPort, backendUserName, backendPassWord, node)
+        if update:
+            self.save(projectName)
 
     def save(self, projectName):
-        # shutil.move(projectName, CONFIG_PATH)
-        print("mv" + projectName + "to" + self.CONFIG_PATH)
+        projectPath = os.path.join(self.CONFIG_PATH, projectName)
+        if os.path.exists(projectPath):
+            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectName)) == 'yes':
+                shutil.rmtree(projectPath)
+            else:
+                return
+        shutil.move(projectName, self.CONFIG_PATH)
+        print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
-
-    def generateFile(self,projectName, regionName, nodeType, backendIP, backendPort, backendUserName, backendPassWord, node):
-        # print(node.get("nodeName"))
+    def generateFile(self, projectName, regionName, nodeType, backendIP, backendPort, backendUserName, backendPassWord, node):
         config = self.loadTemplate(TEMPALTE_FILE_NAME)
-        # print(config.get("CONNECTION","Host"))
         if not backendIP:
             config.set("CONNECTION", "Host", node.get("ip"))
             config.set("CONNECTION", "Port", node.get("port"))
             config.set("CONNECTION:AUTHENTICATION",
-                    "UserName", node.get("username"))
+                       "UserName", node.get("username"))
             config.set("CONNECTION:AUTHENTICATION",
-                    "Password", self.encrypt(node.get("password")))
+                       "Password", self.encrypt(node.get("password")))
 
             config.set("CONNECTION:AUTHENTICATION", "UseExpectSend", "0")
             config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", "0")
         else:
             config.set("CONNECTION", "Host", backendIP)
             config.set("CONNECTION", "Port", backendPort)
-            config.set("CONNECTION:AUTHENTICATION", "UserName", backendUserName)
             config.set("CONNECTION:AUTHENTICATION",
-                    "Password", self.encrypt(backendPassWord))
+                       "UserName", backendUserName)
+            config.set("CONNECTION:AUTHENTICATION",
+                       "Password", self.encrypt(backendPassWord))
 
             config.set("CONNECTION:AUTHENTICATION", "UseExpectSend", "1")
             config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", "2")
 
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Expect_0", "]$ ")
+            config.set("CONNECTION:AUTHENTICATION",
+                       "ExpectSend_Expect_0", "]$ ")
             config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Send_0",
-                    "ssh {0}@{1} -p {2}".format(node.get("username"), node.get("ip"), node.get("port")))
+                       "ssh {0}@{1} -p {2}".format(node.get("username"), node.get("ip"), node.get("port")))
             config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_0", "0")
 
             config.set("CONNECTION:AUTHENTICATION",
-                    "ExpectSend_Expect_1", "password: ")
+                       "ExpectSend_Expect_1", "password: ")
             config.set("CONNECTION:AUTHENTICATION",
-                    "ExpectSend_Send_1", node.get("password"))
+                       "ExpectSend_Send_1", node.get("password"))
             config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_1", "0")
 
         filePath = os.path.join(projectName, regionName, nodeType)
         if not os.path.exists(filePath):
             os.makedirs(filePath)
         config.write(open(os.path.join(filePath, node.get("nodeName") + ".xsh"), "w", encoding="utf-16"),
-                    space_around_delimiters=False)
+                     space_around_delimiters=False)
 
-
-    def loadTemplate(self,fileName):
+    def loadTemplate(self, fileName):
         config = MyConfigParser()
         try:
             config.read(fileName)
         except UnicodeDecodeError:
             config.read(fileName, encoding="utf-16")
-        # config.read(fileName, encoding="utf-8")
-        # print(config.sections())
         return config
 
-
-    def encrypt(self,passwd):
+    def encrypt(self, passwd):
         key = self.getkey()
         tmp = SHA256.new(key.encode('ascii')).digest()
         r3 = passwd.encode('ascii')
@@ -118,7 +116,6 @@ class XShellSessionGenerator():
         r = base64.b64encode(r1).decode('ascii')
         return r
 
-
     def getkey(self):
         userName = win32api.GetUserName()
         computerName = win32api.GetComputerName()
@@ -126,5 +123,3 @@ class XShellSessionGenerator():
             computerName, userName)[0]
         userSIDString = win32security.ConvertSidToStringSid(userSID)
         return userName + userSIDString
-
-
