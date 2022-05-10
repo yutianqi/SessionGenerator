@@ -18,12 +18,11 @@ VERSION_7_CONFIG_PATH = os.path.join(
 
 
 class XShellSessionGenerator():
-    CONFIG_PATH = ""
+    CONFIG_PATH = "D:\\Program Files\\Xshell6\\UserConfig\\Xshell\\Sessions"
     if os.path.exists(VERSION_6_CONFIG_PATH):
         CONFIG_PATH = VERSION_6_CONFIG_PATH
     elif os.path.exists(VERSION_7_CONFIG_PATH):
         CONFIG_PATH = VERSION_7_CONFIG_PATH
-
     def generate(self, data, update=True):
         for (projectName, project) in data.items():
             for (regionName, region) in project.items():
@@ -51,7 +50,7 @@ class XShellSessionGenerator():
     def save(self, projectName):
         projectPath = os.path.join(self.CONFIG_PATH, projectName)
         if os.path.exists(projectPath):
-            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectName)) == 'yes':
+            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) == 'yes':
                 shutil.rmtree(projectPath)
             else:
                 return
