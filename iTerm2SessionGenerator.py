@@ -12,7 +12,7 @@ class iTerm2SessionGenerator():
 
     def getNodeId(self):
         self.nodeIdIndex += 1
-        return str(self.nodeIdIndex)
+        return self.nodeIdIndex
 
     def arrangeNodeId(self, node):
         node["nodeId"] = self.getNodeId()
