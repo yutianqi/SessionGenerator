@@ -4,7 +4,7 @@ import sys
 import base64
 
 import configparser
-
+import winreg
 from getpass import getpass
 from Crypto.Hash import SHA512
 from Crypto.Cipher import AES, DES3
@@ -104,14 +104,31 @@ class Crypt():
 
 
 class MobaXtermSessionGenerator():
-    crypt = Crypt('Huawei@123')
-    print(crypt.decrypt("DCD/yTUSUDkL34PH"))
-    print(crypt.encrypt("Changeme_123"))
 
+    # 读取注册表已加载密码
+
+
+    # 生成密码
+    # 将密码写入注册表
+
+    def generate(self):
+        # 生成配置文件
+        crypt = Crypt('Huawei@123')
+        print(crypt.decrypt("DCD/yTUSUDkL34PH"))
+        print(crypt.encrypt("Changeme_123"))
+
+    def queryKey(self, key):
+        reg=winreg.OpenKey(winreg.HKEY_CURRENT_USER,r"SOFTWARE\Mobatek\MobaXterm\P")
+        try:
+            path=winreg.QueryValueEx(reg, key)
+            print(path)
+        except FileNotFoundError as e:
+            pass
+            print("not found")
+        winreg.CloseKey(reg)
 
 generator = MobaXtermSessionGenerator()
-
-
+generator.queryKey('ssh22:ossuser@10.44.208.82')
 
 
 
