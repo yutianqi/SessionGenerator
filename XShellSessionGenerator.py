@@ -78,19 +78,32 @@ class XShellSessionGenerator():
                        "Password", self.encrypt(backendPassWord))
 
             config.set("CONNECTION:AUTHENTICATION", "UseExpectSend", "1")
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", "2")
 
-            config.set("CONNECTION:AUTHENTICATION",
-                       "ExpectSend_Expect_0", "]$ ")
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Send_0",
-                       "ssh {0}@{1} -p {2}".format(node.get("username"), node.get("ip"), node.get("port")))
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_0", "0")
+            expectSendList = [
+                {
+                    "expect": "]$ ",
+                    "send": "ssh {0}@{1} -p {2}".format(node.get("username"), node.get("ip"), node.get("port")),
+                    "hide": "0"
+                },
+                {
+                    "expect": "password: ",
+                    "send": node.get("password"),
+                    "hide": "0"
+                },
+                {
+                    "expect": "]$ ",
+                    "send": "export HISTSIZE=1000",
+                    "hide": "0"
+                }
+            ]
+            total = len(expectSendList)
+            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", str(total))
 
-            config.set("CONNECTION:AUTHENTICATION",
-                       "ExpectSend_Expect_1", "password: ")
-            config.set("CONNECTION:AUTHENTICATION",
-                       "ExpectSend_Send_1", node.get("password"))
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_1", "0")
+            for index in range(total):
+                item = expectSendList[index]
+                config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Expect_{}".format(index), item.get("expect"))
+                config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Send_{}".format(index), item.get("send"))
+                config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_{}".format(index), item.get("hide"))
 
         filePath = os.path.join(projectName, regionName, nodeType)
         if not os.path.exists(filePath):
