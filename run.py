@@ -18,14 +18,14 @@ def main():
         fileName = sys.argv[1]
     else:
         fileName = DATA_FILE_NAME
-    # parser = NetEcoConfigParser()
-    parser = NetEcoConfigParserV2()
+    parser = NetEcoConfigParser()
+    # parser = NetEcoConfigParserV2()
     data = parser.parse(fileName)
     # print(data)
 
     generator = XShellSessionGenerator()
     # generator = CommonSessionGenerator()
-    generator = iTerm2SessionGenerator()
+    # generator = iTerm2SessionGenerator()
     generator.generate(data, True)
     # generator.generate(data, False)
 

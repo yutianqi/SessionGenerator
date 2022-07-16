@@ -59,6 +59,7 @@ class XShellSessionGenerator():
 
     def generateFile(self, projectName, regionName, nodeType, backendIP, backendPort, backendUserName, backendPassWord, node):
         config = self.loadTemplate(TEMPALTE_FILE_NAME)
+        # 更新连接配置
         if not backendIP:
             config.set("CONNECTION", "Host", node.get("ip"))
             config.set("CONNECTION", "Port", node.get("port"))
@@ -104,6 +105,10 @@ class XShellSessionGenerator():
                 config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Expect_{}".format(index), item.get("expect"))
                 config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Send_{}".format(index), item.get("send"))
                 config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_{}".format(index), item.get("hide"))
+
+        # 更新日志配置
+        config.set("LOGGING", "WriteFileTimestamp", "1")
+        config.set("LOGGING", "AutoStart", "1")
 
         filePath = os.path.join(projectName, regionName, nodeType)
         if not os.path.exists(filePath):
