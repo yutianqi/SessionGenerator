@@ -41,11 +41,9 @@ class XShellSessionGeneratorV2():
 
     def save(self, projectName):
         projectPath = os.path.join(self.CONFIG_PATH, projectName)
-        if os.path.exists(projectPath):
-            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) == 'yes':
-                shutil.rmtree(projectPath)
-            else:
-                return
+        if os.path.exists(projectPath) and input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) != 'yes':
+            return
+        shutil.rmtree(projectPath)
         shutil.move(projectName, self.CONFIG_PATH)
         print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
@@ -68,6 +66,7 @@ class XShellSessionGeneratorV2():
         config.set("CONNECTION:AUTHENTICATION", "UserName", firstJumper[2])
         config.set("CONNECTION:AUTHENTICATION", "Password", self.encrypt(firstJumper[3]))
 
+        # 在expectSendList中指定其他待执行的命令
         if firstJumper[4]:
             expectSendList = firstJumper[4]
         else:
@@ -87,9 +86,9 @@ class XShellSessionGeneratorV2():
                     "hide": "0"
                 },
             ])
+            # 在expectSendList中指定其他待执行的命令
             if jumper[4]:
                 expectSendList.extend(jumper[4])
-        # 在expectSendList中指定其他待执行的命令
 
         total = len(expectSendList)
         config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", str(total))
