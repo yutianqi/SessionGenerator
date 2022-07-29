@@ -40,30 +40,27 @@ class NetEcoConfigParserV2():
         return ret
 
     def parseNode(self, rawMap, jumper):
-
         node = {
             "nodeName": rawMap.get("nodeName"),
             "nodeType": "session",
         }
 
-        if jumper:
-            node["ip"] = jumper.get("ip")
-            node["port"] = jumper.get("port")
-            node["username"] = jumper.get("username")
-            node["password"] = jumper.get("password")
-            node["jumper"] = {
-                "nodeType": "session",
-                "ip":rawMap.get("ip"),
-                "port":rawMap.get("port"),
-                "username":rawMap.get("username"),
-                "password":rawMap.get("password"),    
-            }
-        else:
-            node["ip"] = rawMap.get("ip")
-            node["port"] = rawMap.get("port")
-            node["username"] = rawMap.get("username")
-            node["password"] = rawMap.get("password")
+        node["ip"] = rawMap.get("ip")
+        node["port"] = rawMap.get("port")
+        node["username"] = rawMap.get("username")
+        node["password"] = rawMap.get("password")
 
+
+        if jumper:
+            node["jumper"] = jumper
+        else:
+            node["expectCmds"] = [
+                {
+                    "expect": "]$ ",
+                    "send": "export HISTSIZE=1000",
+                    "hide": "0"
+                }
+            ]
         return node
 
     def parse(self, dataFileName):
@@ -72,39 +69,46 @@ class NetEcoConfigParserV2():
         for projectName, projectData in rawMap.items():
             # print("projectName=" + projectName)
 
-            projectNode = {
-                "nodeName": projectName,
-                "nodeType": "directory",
-            }
             childRegionNodes = []
-
             for regionName, reginData in projectData.items():
                 # print("regionName=" + regionName)
+
+                # 每个project数据，首先找到Backend数据，作为其他节点的jumper
                 backEndNode = reginData.get("Backend")[0]
                 jumper = self.parseNode(backEndNode, {})
+
+                childTypeNodes = []
+                for typeName, typeData in reginData.items():
+                    # print("typeName=" + typeName)
+                    # 对于Backend节点，仅作为其他节点跳转使用，无需创建真实节点
+                    if typeName == 'Backend':
+                        continue
+
+                    childNodes = []
+                    for node in typeData:
+                        # print(node.get("nodeName"))
+                        if typeName == 'Master':
+                            childNodes.append(self.parseNode(node, {}))
+                        else:
+                            childNodes.append(self.parseNode(node, jumper))
+                    typeNode = {
+                        "nodeName": typeName,
+                        "nodeType": "directory",
+                        "childNodes": childNodes
+                    }
+                    childTypeNodes.append(typeNode)
 
                 regionNode = {
                     "nodeName": regionName,
                     "nodeType": "directory",
+                    "childNodes": childTypeNodes
                 }
-                childTypeNodes = []
-                for typeName, typeData in reginData.items():
-                    # print("typeName=" + typeName)
-                    if typeName == 'Backend':
-                        continue
-
-                    typeNode = {
-                        "nodeName": typeName,
-                        "nodeType": "directory",
-                    }
-                    childNodes = []
-                    for node in typeData:
-                        # print(node.get("nodeName"))
-                        childNodes.append(self.parseNode(node, jumper))
-                    typeNode["childNodes"] = childNodes
-                    childTypeNodes.append(typeNode)
-                regionNode["childNodes"] = childTypeNodes
                 childRegionNodes.append(regionNode)
-            projectNode["childNodes"] = childRegionNodes
+
+            projectNode = {
+                "nodeName": projectName,
+                "nodeType": "directory",
+                "childNodes": childRegionNodes
+            }
             projectNodes.append(projectNode)
         return projectNodes

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #encoding=utf8
 
+import json
 import sys
 from NetEcoConfigParser import NetEcoConfigParser
 from NetEcoConfigParserV2 import NetEcoConfigParserV2
 from XShellSessionGenerator import XShellSessionGenerator
 from CommonSessionGenerator import CommonSessionGenerator
+from generator.XShellSessionGeneratorV2 import XShellSessionGeneratorV2
 from iTerm2SessionGenerator import iTerm2SessionGenerator
 
 
@@ -18,19 +20,29 @@ def main():
         fileName = sys.argv[1]
     else:
         fileName = DATA_FILE_NAME
+    # runV1(fileName)
+    runV2(fileName)
+
+def runV1(fileName):
     parser = NetEcoConfigParser()
-    # parser = NetEcoConfigParserV2()
     data = parser.parse(fileName)
     # print(data)
+    generator = XShellSessionGeneratorV2()
+    # generator = CommonSessionGenerator()
+    # generator = iTerm2SessionGenerator()
+    # generator.generate(data, True)
+    # generator.generate(data, False)
 
-    generator = XShellSessionGenerator()
+
+def runV2(fileName):
+    parser = NetEcoConfigParserV2()
+    data = parser.parse(fileName)
+    # print(json.dumps(data))
+    generator = XShellSessionGeneratorV2()
     # generator = CommonSessionGenerator()
     # generator = iTerm2SessionGenerator()
     generator.generate(data, True)
     # generator.generate(data, False)
-
-
 if __name__ == '__main__':
-    # print(getkey())
-    # print(encrypt("Changeme_123"))
     main()
+
