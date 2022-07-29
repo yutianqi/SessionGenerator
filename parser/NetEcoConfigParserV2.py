@@ -53,7 +53,6 @@ class NetEcoConfigParserV2():
 
         if jumper:
             node["jumper"] = jumper
-        else:
             node["expectCmds"] = [
                 {
                     "expect": "]$ ",
@@ -89,8 +88,36 @@ class NetEcoConfigParserV2():
                         # print(node.get("nodeName"))
                         if typeName == 'Master':
                             childNodes.append(self.parseNode(node, {}))
-                        else:
-                            childNodes.append(self.parseNode(node, jumper))
+                            continue
+                        if typeName == 'DB':
+                            tmpNode = self.parseNode(node, jumper)
+                            if not tmpNode.get("expectCmds"):
+                                tmpNode["expectCmds"] = []
+                            tmpNode["expectCmds"] = [
+                                {
+                                    "expect": "]$ ",
+                                    "send": "su -",
+                                    "hide": "0"
+                                },
+                                {
+                                    "expect": "password: ",
+                                    "send": "Changeme_123",
+                                    "hide": "0"
+                                },
+                                {
+                                    "expect": "]$ ",
+                                    "send": "su - dbuser",
+                                    "hide": "0"
+                                },
+                                {
+                                    "expect": "password: ",
+                                    "send": "Changeme_123",
+                                    "hide": "0"
+                                }
+                            ] + tmpNode["expectCmds"]
+                            childNodes.append(tmpNode)
+                            continue
+                        childNodes.append(self.parseNode(node, jumper))
                     typeNode = {
                         "nodeName": typeName,
                         "nodeType": "directory",
