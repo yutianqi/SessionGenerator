@@ -100,18 +100,13 @@ class NetEcoConfigParserV2():
                                     "hide": "0"
                                 },
                                 {
-                                    "expect": "password: ",
+                                    "expect": "Password: ",
                                     "send": "Changeme_123",
                                     "hide": "0"
                                 },
                                 {
-                                    "expect": "]$ ",
+                                    "expect": "]# ",
                                     "send": "su - dbuser",
-                                    "hide": "0"
-                                },
-                                {
-                                    "expect": "password: ",
-                                    "send": "Changeme_123",
                                     "hide": "0"
                                 }
                             ] + tmpNode["expectCmds"]
