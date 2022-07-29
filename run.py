@@ -4,11 +4,11 @@
 import json
 import sys
 from NetEcoConfigParser import NetEcoConfigParser
-from NetEcoConfigParserV2 import NetEcoConfigParserV2
+from parser.NetEcoConfigParserV2 import NetEcoConfigParserV2
 from XShellSessionGenerator import XShellSessionGenerator
 from CommonSessionGenerator import CommonSessionGenerator
 from generator.XShellSessionGeneratorV2 import XShellSessionGeneratorV2
-from iTerm2SessionGenerator import iTerm2SessionGenerator
+from generator.iTerm2SessionGenerator import iTerm2SessionGenerator
 
 
 DATA_FILE_NAME = 'data.csv'
@@ -38,9 +38,9 @@ def runV2(fileName):
     parser = NetEcoConfigParserV2()
     data = parser.parse(fileName)
     # print(json.dumps(data))
-    generator = XShellSessionGeneratorV2()
+    # generator = XShellSessionGeneratorV2()
     # generator = CommonSessionGenerator()
-    # generator = iTerm2SessionGenerator()
+    generator = iTerm2SessionGenerator()
     generator.generate(data, True)
     # generator.generate(data, False)
 if __name__ == '__main__':
