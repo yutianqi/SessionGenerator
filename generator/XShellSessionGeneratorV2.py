@@ -41,9 +41,11 @@ class XShellSessionGeneratorV2():
 
     def save(self, projectName):
         projectPath = os.path.join(self.CONFIG_PATH, projectName)
-        if os.path.exists(projectPath) and input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) != 'yes':
-            return
-        shutil.rmtree(projectPath)
+        if os.path.exists(projectPath):
+            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) != 'yes':
+                return
+            else:
+                shutil.rmtree(projectPath)
         shutil.move(projectName, self.CONFIG_PATH)
         print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
@@ -54,7 +56,7 @@ class XShellSessionGeneratorV2():
 
         jumper = node
         while(jumper):
-            jumpers.append((jumper.get("ip"), jumper.get("port"), jumper.get("username"), jumper.get("password"), jumper.get("expectCmds")))
+            jumpers.append((jumper.get("ip"), jumper.get("port"), jumper.get("username"), jumper.get("password"), jumper.get("proxy"), jumper.get("expectCmds")))
             jumper = jumper.get("jumper")
 
         print(jumpers)
@@ -65,10 +67,12 @@ class XShellSessionGeneratorV2():
         config.set("CONNECTION", "Port", firstJumper[1])
         config.set("CONNECTION:AUTHENTICATION", "UserName", firstJumper[2])
         config.set("CONNECTION:AUTHENTICATION", "Password", self.encrypt(firstJumper[3]))
+        if (firstJumper[4]):
+            config.set("CONNECTION:PROXY", "Proxy", firstJumper[4])
 
         # 在expectSendList中指定其他待执行的命令
-        if firstJumper[4]:
-            expectSendList = firstJumper[4]
+        if firstJumper[5]:
+            expectSendList = firstJumper[5]
         else:
             expectSendList = []
 
@@ -87,8 +91,8 @@ class XShellSessionGeneratorV2():
                 },
             ])
             # 在expectSendList中指定其他待执行的命令
-            if jumper[4]:
-                expectSendList.extend(jumper[4])
+            if jumper[5]:
+                expectSendList.extend(jumper[5])
 
         total = len(expectSendList)
         config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Count", str(total))

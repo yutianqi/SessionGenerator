@@ -18,6 +18,7 @@ class NetEcoConfigParserV2():
                 nodePort = fields[5]
                 username = fields[6]
                 password = fields[7]
+                proxy = fields[8]
 
                 if not ret.get(projectName):
                     ret[projectName] = {}
@@ -35,7 +36,8 @@ class NetEcoConfigParserV2():
                     "ip": nodeIP,
                     "port": nodePort,
                     "username": username,
-                    "password": password
+                    "password": password,
+                    "proxy": proxy
                 })
         return ret
 
@@ -49,7 +51,7 @@ class NetEcoConfigParserV2():
         node["port"] = rawMap.get("port")
         node["username"] = rawMap.get("username")
         node["password"] = rawMap.get("password")
-
+        node["proxy"] = rawMap.get("proxy")
 
         if jumper:
             node["jumper"] = jumper
@@ -87,8 +89,9 @@ class NetEcoConfigParserV2():
                     for node in typeData:
                         # print(node.get("nodeName"))
                         if typeName == 'Master':
-                            childNodes.append(self.parseNode(node, {}))
-                            continue
+                            # childNodes.append(self.parseNode(node, jumper))
+                            # continue
+                            pass
                         if typeName == 'DB':
                             tmpNode = self.parseNode(node, jumper)
                             if not tmpNode.get("expectCmds"):
@@ -101,7 +104,7 @@ class NetEcoConfigParserV2():
                                 },
                                 {
                                     "expect": "Password: ",
-                                    "send": "Changeme_123",
+                                    "send": tmpNode["password"],
                                     "hide": "0"
                                 },
                                 {

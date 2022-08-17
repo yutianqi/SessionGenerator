@@ -37,7 +37,7 @@ def runV1(fileName):
 def runV2(fileName):
     parser = NetEcoConfigParserV2()
     data = parser.parse(fileName)
-    print(json.dumps(data))
+    # print(json.dumps(data))
     generator = XShellSessionGeneratorV2()
     # generator = CommonSessionGenerator()
     # generator = iTerm2SessionGenerator()
