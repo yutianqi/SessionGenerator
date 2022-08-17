@@ -41,13 +41,26 @@ class XShellSessionGeneratorV2():
 
     def save(self, projectName):
         projectPath = os.path.join(self.CONFIG_PATH, projectName)
-        if os.path.exists(projectPath):
-            if input("项目[{}]已存在, 是否替换, yes/no: ".format(projectPath)) != 'yes':
-                return
-            else:
-                shutil.rmtree(projectPath)
-        shutil.move(projectName, self.CONFIG_PATH)
-        print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
+        if not os.path.exists(projectPath):
+            shutil.move(projectName, self.CONFIG_PATH)
+            print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
+            return
+        if input("项目[{}]已存在, 是否合并, yes/no: ".format(projectPath)) == 'yes':
+            duplicateSessions = []
+            for root,dirs,files in os.walk(projectName):
+                for filespath in files:
+                    tmpPath = os.path.join(self.CONFIG_PATH, root, filespath)
+                    print(tmpPath)
+                    if os.path.exists(tmpPath):
+                        duplicateSessions.append(os.path.join(root, filespath))
+                    else:
+                        shutil.move(os.path.join(root, filespath), tmpPath)
+            if duplicateSessions and input("存在{}个重复Session, 是否覆盖, yes/no: ".format(len(duplicateSessions))) == 'yes':
+                for item in duplicateSessions:
+                    os.remove(os.path.join(self.CONFIG_PATH, item))
+                    shutil.move(item, os.path.join(self.CONFIG_PATH, item))
+                shutil.rmtree(projectName)
+            print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
     def generateFile(self, projectName, regionName, nodeType, node):
         config = self.loadTemplate(TEMPALTE_FILE_NAME)
