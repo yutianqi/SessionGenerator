@@ -41,38 +41,40 @@ class XShellSessionGeneratorV2():
 
     def save(self, projectName):
         projectPath = os.path.join(self.CONFIG_PATH, projectName)
+        # 新项目，直接整目录移动
         if not os.path.exists(projectPath):
             shutil.move(projectName, self.CONFIG_PATH)
             print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
             return
-        if input("项目[{}]已存在, 是否合并, yes/no: ".format(projectPath)) == 'yes':
-            duplicateSessions = []
-            for root,dirs,files in os.walk(projectName):
-                for filespath in files:
-                    tmpPath = os.path.join(self.CONFIG_PATH, root, filespath)
-                    print(tmpPath)
-                    if os.path.exists(tmpPath):
-                        duplicateSessions.append(os.path.join(root, filespath))
-                    else:
-                        shutil.move(os.path.join(root, filespath), tmpPath)
-            if duplicateSessions and input("存在{}个重复Session, 是否覆盖, yes/no: ".format(len(duplicateSessions))) == 'yes':
-                for item in duplicateSessions:
+
+        # 识别新增和重复的Session，逐个移动，使用allSessions，保证Session树展示顺序
+        allSessions = []
+        duplicateSessions = []
+        if not allSessions:
+            print("未检测到Session文件")
+            return
+        for root, dirs, files in os.walk(projectName):
+            for filespath in files:
+                sessionPath = os.path.join(root, filespath)
+                if os.path.exists(os.path.join(self.CONFIG_PATH, sessionPath)):
+                    duplicateSessions.append(sessionPath)
+                allSessions.append(sessionPath)
+        if not duplicateSessions or input("存在{}个重复Session, 是否合并, yes/no: ".format(len(duplicateSessions))) == 'yes':
+            for item in allSessions:
+                if item in duplicateSessions:
                     os.remove(os.path.join(self.CONFIG_PATH, item))
-                    shutil.move(item, os.path.join(self.CONFIG_PATH, item))
-                shutil.rmtree(projectName)
-            print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
+                shutil.move(item, os.path.join(self.CONFIG_PATH, item))
+        shutil.rmtree(projectName)
+        print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
     def generateFile(self, projectName, regionName, nodeType, node):
         config = self.loadTemplate(TEMPALTE_FILE_NAME)
-
         jumpers = []
-
         jumper = node
         while(jumper):
             jumpers.append((jumper.get("ip"), jumper.get("port"), jumper.get("username"), jumper.get("password"), jumper.get("proxy"), jumper.get("expectCmds")))
             jumper = jumper.get("jumper")
-
-        print(jumpers)
+        # print(jumpers)
 
         # 首个jumper的配置需要直接在配置文件中指定
         firstJumper = jumpers.pop()
