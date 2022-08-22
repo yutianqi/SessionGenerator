@@ -50,15 +50,15 @@ class XShellSessionGeneratorV2():
         # 识别新增和重复的Session，逐个移动，使用allSessions，保证Session树展示顺序
         allSessions = []
         duplicateSessions = []
-        if not allSessions:
-            print("未检测到Session文件")
-            return
         for root, dirs, files in os.walk(projectName):
             for filespath in files:
                 sessionPath = os.path.join(root, filespath)
                 if os.path.exists(os.path.join(self.CONFIG_PATH, sessionPath)):
                     duplicateSessions.append(sessionPath)
                 allSessions.append(sessionPath)
+        if not allSessions:
+            print("未检测到Session文件")
+            return
         if not duplicateSessions or input("存在{}个重复Session, 是否合并, yes/no: ".format(len(duplicateSessions))) == 'yes':
             for item in allSessions:
                 if item in duplicateSessions:
