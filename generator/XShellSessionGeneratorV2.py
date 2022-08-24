@@ -63,7 +63,10 @@ class XShellSessionGeneratorV2():
             for item in allSessions:
                 if item in duplicateSessions:
                     os.remove(os.path.join(self.CONFIG_PATH, item))
-                shutil.move(item, os.path.join(self.CONFIG_PATH, item))
+                dstPath = os.path.join(self.CONFIG_PATH, item)
+                if not os.path.exists(os.path.dirname(dstPath)):
+                    os.mkdir(os.path.dirname(dstPath))
+                shutil.move(item, dstPath)
         shutil.rmtree(projectName)
         print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
