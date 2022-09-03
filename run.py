@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #encoding=utf8
 
-import json
+import os
 import sys
 from NetEcoConfigParser import NetEcoConfigParser
 from parser.NetEcoConfigParserV2 import NetEcoConfigParserV2
@@ -46,4 +46,4 @@ def runV2(fileName):
 
 if __name__ == '__main__':
     main()
-
+    os.system("pause")
