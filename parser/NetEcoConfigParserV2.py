@@ -4,6 +4,15 @@
 class NetEcoConfigParserV2():
 
     def read(self, dataFileName):
+        """
+        Load data from configuration file and parse lines
+
+		Parameters:
+		  dataFileName - configuration file name 
+
+        Returns:
+          raw record map
+        """
         ret = {}
         with open(dataFileName, 'r') as f:
             for x in f.readlines()[1:]:
@@ -42,6 +51,16 @@ class NetEcoConfigParserV2():
         return ret
 
     def parseNode(self, rawMap, jumper):
+        """
+        trans raw record to nodes
+
+		Parameters:
+		  rawMap - node raw data
+          jumper - jumper of the node
+
+        Returns:
+          node
+        """
         node = {
             "nodeName": rawMap.get("nodeName"),
             "nodeType": "session",
@@ -73,10 +92,11 @@ class NetEcoConfigParserV2():
             childRegionNodes = []
             for regionName, reginData in projectData.items():
                 # print("regionName=" + regionName)
-
+                # print(reginData)
                 # 每个project数据，首先找到Backend数据，作为其他节点的jumper
-                backEndNode = reginData.get("Backend")[0]
-                jumper = self.parseNode(backEndNode, {})
+                if reginData.get("Backend"):
+                    backEndNode = reginData.get("Backend")[0]
+                    jumper = self.parseNode(backEndNode, {})
 
                 childTypeNodes = []
                 for typeName, typeData in reginData.items():
@@ -122,6 +142,9 @@ class NetEcoConfigParserV2():
                         "childNodes": childNodes
                     }
                     childTypeNodes.append(typeNode)
+
+                if backEndNode:
+                    regionName += "_" + backEndNode.get("ip")
 
                 regionNode = {
                     "nodeName": regionName,

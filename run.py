@@ -3,6 +3,7 @@
 
 import os
 import sys
+import json
 from NetEcoConfigParser import NetEcoConfigParser
 from parser.NetEcoConfigParserV2 import NetEcoConfigParserV2
 from XShellSessionGenerator import XShellSessionGenerator
@@ -19,7 +20,7 @@ def main():
     if len(sys.argv) > 1:
         fileName = sys.argv[1]
     else:
-        fileName = DATA_FILE_NAME
+        fileName = os.path.join(os.path.dirname(sys.argv[0]), DATA_FILE_NAME)
     # runV1(fileName)
     runV2(fileName)
 

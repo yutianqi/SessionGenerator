@@ -9,8 +9,10 @@ import win32security
 from Crypto.Hash import SHA256
 from Crypto.Cipher import ARC4
 from domain.my_config_parser import MyConfigParser
+import sys
 
-TEMPALTE_FILE_NAME = 'template.xsh'
+TEMPALTE_FILE_NAME = os.path.join(os.path.dirname(sys.argv[0]), 'template.xsh')
+
 VERSION_6_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
 VERSION_7_CONFIG_PATH = os.path.join(
