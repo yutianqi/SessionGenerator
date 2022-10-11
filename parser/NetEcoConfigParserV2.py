@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #encoding=utf8
+import os
 
 class NetEcoConfigParserV2():
 
@@ -13,6 +14,8 @@ class NetEcoConfigParserV2():
         Returns:
           raw record map
         """
+        if not os.path.exists(dataFileName):
+            raise RuntimeError("Session配置文件[{}]不存在".format(dataFileName))
         ret = {}
         with open(dataFileName, 'r') as f:
             for x in f.readlines()[1:]:

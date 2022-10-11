@@ -36,14 +36,17 @@ def runV1(fileName):
 
 
 def runV2(fileName):
-    parser = NetEcoConfigParserV2()
-    data = parser.parse(fileName)
-    # print(json.dumps(data))
-    generator = XShellSessionGeneratorV2()
-    # generator = CommonSessionGenerator()
-    # generator = iTerm2SessionGenerator()
-    generator.generate(data, True)
-    # generator.generate(data, False)
+    try:
+        parser = NetEcoConfigParserV2()
+        data = parser.parse(fileName)
+        # print(json.dumps(data))
+        generator = XShellSessionGeneratorV2()
+        # generator = CommonSessionGenerator()
+        # generator = iTerm2SessionGenerator()
+        generator.generate(data, True)
+        # generator.generate(data, False)
+    except Exception as e:
+        print(e)
 
 if __name__ == '__main__':
     main()

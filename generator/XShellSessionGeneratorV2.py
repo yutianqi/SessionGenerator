@@ -11,20 +11,25 @@ from Crypto.Cipher import ARC4
 from domain.my_config_parser import MyConfigParser
 import sys
 
-TEMPALTE_FILE_NAME = os.path.join(os.path.dirname(sys.argv[0]), 'template.xsh')
 
 VERSION_6_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "6", "Xshell", "Sessions")
 VERSION_7_CONFIG_PATH = os.path.join(
     os.environ["USERPROFILE"], "Documents", "NetSarang Computer", "7", "Xshell", "Sessions")
 
-class XShellSessionGeneratorV2():
-    CONFIG_PATH = "D:\\Program Files\\Xshell6\\UserConfig\\Xshell\\Sessions"
 
-    if os.path.exists(VERSION_6_CONFIG_PATH):
-        CONFIG_PATH = VERSION_6_CONFIG_PATH
-    elif os.path.exists(VERSION_7_CONFIG_PATH):
-        CONFIG_PATH = VERSION_7_CONFIG_PATH
+class XShellSessionGeneratorV2():
+    CONFIG_PATH = ""
+    TEMPALTE_FILE_NAME = ""
+
+    def __init__(self):
+        if os.path.exists(VERSION_6_CONFIG_PATH):
+            self.CONFIG_PATH = VERSION_6_CONFIG_PATH
+        elif os.path.exists(VERSION_7_CONFIG_PATH):
+            self.CONFIG_PATH = VERSION_7_CONFIG_PATH
+        else:
+            raise RuntimeError("找不到XShell配置文件目录")
+        self.TEMPALTE_FILE_NAME = os.path.join(self.CONFIG_PATH, 'default')
 
     def generate(self, data, update=True):
         for project in data:
@@ -37,7 +42,8 @@ class XShellSessionGeneratorV2():
                     nodeTypeName = nodeType.get("nodeName")
                     nodes = nodeType.get("childNodes")
                     for node in nodes:
-                        self.generateFile(projectName, regionName, nodeTypeName, node)
+                        self.generateFile(
+                            projectName, regionName, nodeTypeName, node)
         if update:
             self.save(projectName)
 
@@ -66,28 +72,31 @@ class XShellSessionGeneratorV2():
                 if item in duplicateSessions:
                     os.remove(os.path.join(self.CONFIG_PATH, item))
                 dstPath = os.path.join(self.CONFIG_PATH, item)
-                print(dstPath)
+                # print(dstPath)
                 if not os.path.exists(os.path.dirname(dstPath)):
                     os.makedirs(os.path.dirname(dstPath))
                 shutil.move(item, dstPath)
+                print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
         shutil.rmtree(projectName)
-        print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
 
     def generateFile(self, projectName, regionName, nodeType, node):
-        config = self.loadTemplate(TEMPALTE_FILE_NAME)
+        config = self.loadTemplate(self.TEMPALTE_FILE_NAME)
         jumpers = []
         jumper = node
-        while(jumper):
-            jumpers.append((jumper.get("ip"), jumper.get("port"), jumper.get("username"), jumper.get("password"), jumper.get("proxy"), jumper.get("expectCmds")))
+        while (jumper):
+            jumpers.append((jumper.get("ip"), jumper.get("port"), jumper.get(
+                "username"), jumper.get("password"), jumper.get("proxy"), jumper.get("expectCmds")))
             jumper = jumper.get("jumper")
         # print(jumpers)
 
         # 首个jumper的配置需要直接在配置文件中指定
         firstJumper = jumpers.pop()
+        config.set("SessionInfo", "Version", "6.0")
         config.set("CONNECTION", "Host", firstJumper[0])
         config.set("CONNECTION", "Port", firstJumper[1])
         config.set("CONNECTION:AUTHENTICATION", "UserName", firstJumper[2])
-        config.set("CONNECTION:AUTHENTICATION", "Password", self.encrypt(firstJumper[3]))
+        config.set("CONNECTION:AUTHENTICATION", "Password",
+                   self.encrypt(firstJumper[3]))
         if (firstJumper[4]):
             config.set("CONNECTION:PROXY", "Proxy", firstJumper[4])
 
@@ -121,9 +130,12 @@ class XShellSessionGeneratorV2():
 
         for index in range(total):
             item = expectSendList[index]
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Expect_{}".format(index), item.get("expect"))
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Send_{}".format(index), item.get("send"))
-            config.set("CONNECTION:AUTHENTICATION", "ExpectSend_Hide_{}".format(index), item.get("hide"))
+            config.set("CONNECTION:AUTHENTICATION",
+                       "ExpectSend_Expect_{}".format(index), item.get("expect"))
+            config.set("CONNECTION:AUTHENTICATION",
+                       "ExpectSend_Send_{}".format(index), item.get("send"))
+            config.set("CONNECTION:AUTHENTICATION",
+                       "ExpectSend_Hide_{}".format(index), item.get("hide"))
 
         # 更新日志配置
         config.set("LOGGING", "WriteFileTimestamp", "1")
@@ -159,3 +171,4 @@ class XShellSessionGeneratorV2():
             computerName, userName)[0]
         userSIDString = win32security.ConvertSidToStringSid(userSID)
         return userName + userSIDString
+
