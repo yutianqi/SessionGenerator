@@ -4,10 +4,10 @@
 import os
 import sys
 import json
-from NetEcoConfigParser import NetEcoConfigParser
+from parser.NetEcoConfigParser import NetEcoConfigParser
 from parser.NetEcoConfigParserV2 import NetEcoConfigParserV2
-from XShellSessionGenerator import XShellSessionGenerator
-from CommonSessionGenerator import CommonSessionGenerator
+from generator.XShellSessionGenerator import XShellSessionGenerator
+from generator.CommonSessionGenerator import CommonSessionGenerator
 from generator.XShellSessionGeneratorV2 import XShellSessionGeneratorV2
 from generator.iTerm2SessionGenerator import iTerm2SessionGenerator
 
