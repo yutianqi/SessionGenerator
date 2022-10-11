@@ -1,3 +1,6 @@
 .gitignore
 *__pycache__
 sessions.json
+build/
+dist/
+run.spec
