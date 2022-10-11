@@ -52,7 +52,7 @@ class XShellSessionGeneratorV2():
         # 新项目，直接整目录移动
         if not os.path.exists(projectPath):
             shutil.move(projectName, self.CONFIG_PATH)
-            print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
+            print("已保存项目[{}]到[{}]".format(projectName, self.CONFIG_PATH))
             return
 
         # 识别新增和重复的Session，逐个移动，使用allSessions，保证Session树展示顺序
@@ -76,7 +76,7 @@ class XShellSessionGeneratorV2():
                 if not os.path.exists(os.path.dirname(dstPath)):
                     os.makedirs(os.path.dirname(dstPath))
                 shutil.move(item, dstPath)
-                print("保存[{}]到[{}]".format(projectName, self.CONFIG_PATH))
+            print("已保存项目[{}]到[{}]".format(projectName, self.CONFIG_PATH))
         shutil.rmtree(projectName)
 
     def generateFile(self, projectName, regionName, nodeType, node):
