@@ -1,5 +1,5 @@
 ProjectName,RegionName,NodeType,NodeName,NodeIP,NodePort,Username,Password,Proxy
-ProjectName1,RegionName1,Backend,Backend,122.9.153.240,22,ossuser,Huawei@Cloud8#,cn
+ProjectName1,RegionName1,Backend,Backend,127.0.0.1,22,ossuser,Huawei@Cloud8#,cn
 ProjectName1,RegionName1,Master,Master1,127.0.0.1,22,ossuser,Huawei@Cloud8#,cn
 ProjectName1,RegionName1,DB,DB01,127.0.0.1,22,ossuser,Huawei@Cloud8#,cn
 ProjectName1,RegionName1,Disb,Disb1,127.0.0.1,22,ossuser,Huawei@Cloud8#,cn
